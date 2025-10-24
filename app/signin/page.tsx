@@ -39,29 +39,30 @@ export default function SignInPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-
+    const toastId = toast.loading("Signing in...");
     try {
       await signIn(values.email, values.password, {
         onRequest: () => {
           setIsLoading(true);
           if (isLoading) {
-            toast.loading("Signing in...");
+            toast.loading("Signing in...", { id: toastId });
           }
         },
         onSuccess: () => {
           setIsLoading(false);
-          toast.success("Sign in successful!");
+          toast.success("Sign in successful!", { id: toastId });
           window.location.href = "/";
         },
         onError: (ctx: { error: { message?: string } }) => {
           setIsLoading(false);
-          toast.error(ctx.error.message || "Sign in failed!");
+          toast.error(ctx.error.message || "Sign in failed!", { id: toastId });
         },
       });
     } catch (err) {
       setIsLoading(false);
-      toast.dismiss();
-      toast.error(err instanceof Error ? err.message : "Unknown error");
+      toast.error(err instanceof Error ? err.message : "Unknown error", {
+        id: toastId,
+      });
     } finally {
       setIsLoading(false);
     }

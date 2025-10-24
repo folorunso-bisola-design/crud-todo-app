@@ -41,27 +41,28 @@ export default function SignUpPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-
+    const toastId = toast.loading("Signing up...");
     try {
       await signUp(values.email, values.password, values.username, {
         onRequest: () => {
           setIsLoading(true);
-          toast.loading("Signing up...");
+          toast.loading("Signing up...", { id: toastId });
         },
         onSuccess: () => {
           setIsLoading(false);
-          toast.success("Sign up successful!");
+          toast.success("Sign up successful!", { id: toastId });
           window.location.href = "/";
         },
         onError: (ctx: { error: { message?: string } }) => {
           setIsLoading(false);
-          toast.error(ctx.error.message || "Sign up failed!");
+          toast.error(ctx.error.message || "Sign up failed!", { id: toastId });
         },
       });
     } catch (err) {
       setIsLoading(false);
       toast.error(
-        err instanceof Error ? err.message : "Unknown error occurred"
+        err instanceof Error ? err.message : "Unknown error occurred",
+        { id: toastId }
       );
     }
   }
