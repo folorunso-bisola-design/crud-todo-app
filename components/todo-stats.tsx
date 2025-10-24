@@ -1,8 +1,6 @@
 "use client";
 
-import { useTodoStore } from "@/lib/todo-store";
 import { Note } from "@/types/todo";
-import { useEffect, useState } from "react";
 
 export default function TodoStats({ notes }: { notes: Note[] }) {
   return (

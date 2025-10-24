@@ -26,7 +26,7 @@ export default function Home() {
   const [notes, setNotes] = React.useState<Note[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const { data: session, isPending, error, refetch } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
 
   React.useEffect(() => {
     if (!isPending && !session) {
@@ -44,8 +44,8 @@ export default function Home() {
       } else {
         throw new Error(data.error);
       }
-    } catch (error) {
-      console.error("Error fetching todos:", error);
+    } catch (err) {
+      console.error("Error fetching todos:", err);
     } finally {
       setIsLoading(false);
     }
@@ -63,8 +63,9 @@ export default function Home() {
     try {
       await signOut();
       toast.success("Signed out successfully");
-    } catch (error) {
+    } catch (err) {
       toast.error("Failed to sign out");
+      console.error("Sign out error:", err);
     } finally {
       setIsLoading(false);
     }

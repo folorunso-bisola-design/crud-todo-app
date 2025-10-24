@@ -1,6 +1,5 @@
 "use client";
 
-import { useTodoStore } from "@/lib/todo-store";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -12,7 +11,6 @@ export default function AddTodoForm({
   onChanged?: () => void;
 }) {
   const [input, setInput] = useState("");
-  const addTodo = useTodoStore((state) => state.addTodo);
 
   const handleSubmit = async () => {
     if (!input.trim()) return;

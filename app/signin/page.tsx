@@ -28,7 +28,6 @@ const formSchema = z.object({
 export default function SignInPage() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -39,33 +38,30 @@ export default function SignInPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setError(null);
     setIsLoading(true);
 
     try {
-      const { data, error } = await signIn(values.email, values.password, {
+      await signIn(values.email, values.password, {
         onRequest: () => {
           setIsLoading(true);
-          isLoading ? toast.loading("Signing in...") : null;
+          if (isLoading) {
+            toast.loading("Signing in...");
+          }
         },
-        onSuccess: (ctx: any) => {
+        onSuccess: () => {
           setIsLoading(false);
           toast.success("Sign in successful!");
-          // console.log("onSuccess callback - Sign in successful!", ctx);
           window.location.href = "/";
         },
-        onError: (ctx: any) => {
+        onError: (ctx: { error: { message?: string } }) => {
           setIsLoading(false);
-          toast.error("Sign in failed!");
-          // console.error("onError callback - Sign in failed:", ctx);
-          // console.error("Error details:", JSON.stringify(ctx.error, null, 2));
-          setError(ctx.error.message || "Sign in failed");
+          toast.error(ctx.error.message || "Sign in failed!");
         },
       });
-    } catch (error) {
+    } catch (err) {
       setIsLoading(false);
       toast.dismiss();
-      setError(error instanceof Error ? error.message : "Unknown error");
+      toast.error(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setIsLoading(false);
     }

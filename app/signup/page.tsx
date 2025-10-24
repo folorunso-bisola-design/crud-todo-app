@@ -29,7 +29,6 @@ const formSchema = z.object({
 export default function SignUpPage() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,37 +40,29 @@ export default function SignUpPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setError(null);
     setIsLoading(true);
 
     try {
-      const { data, error } = await signUp(
-        values.email,
-        values.password,
-        values.username,
-        {
-          onRequest: () => {
-            setIsLoading(true);
-            toast.loading("Signing up...");
-          },
-          onSuccess: (ctx: any) => {
-            setIsLoading(false);
-            toast.success("Sign up successful!");
-            // console.log("onSuccess callback - Sign up successful!", ctx);
-            window.location.href = "/";
-          },
-          onError: (ctx: any) => {
-            setIsLoading(false);
-            toast.error("Sign up failed!");
-            // console.error("onError callback - Sign up failed:", ctx);
-            // console.error("Error details:", JSON.stringify(ctx.error, null, 2));
-            setError(ctx.error.message || "Sign up failed");
-          },
-        }
-      );
+      await signUp(values.email, values.password, values.username, {
+        onRequest: () => {
+          setIsLoading(true);
+          toast.loading("Signing up...");
+        },
+        onSuccess: () => {
+          setIsLoading(false);
+          toast.success("Sign up successful!");
+          window.location.href = "/";
+        },
+        onError: (ctx: { error: { message?: string } }) => {
+          setIsLoading(false);
+          toast.error(ctx.error.message || "Sign up failed!");
+        },
+      });
     } catch (err) {
       setIsLoading(false);
-      setError(err instanceof Error ? err.message : "Unknown error occurred");
+      toast.error(
+        err instanceof Error ? err.message : "Unknown error occurred"
+      );
     }
   }
 
